@@ -1,9 +1,10 @@
-const Appointment = require('../models/Booking');
-const Hospital = require('../models/Campground');
-// @desc    Get all hospitals      
-// @route   GET /api/v1/hospitals
+const Booking = require('../models/Booking');
+const Campground = require('../models/Campground');
+
+// @desc    Get all campgrounds      
+// @route   GET /api/v1/campgrounds
 // @access  Public
-exports.getHospitals = async (req, res, next) => {
+exports.getCampgrounds = async (req, res, next) => {
   let query;
 
   // Copy req.query
@@ -23,7 +24,7 @@ exports.getHospitals = async (req, res, next) => {
   queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in)\b/g, match=>`$${match}`);
 
   // finding resource
-  query = Hospital.find(JSON.parse(queryStr)).populate('appointments');
+  query = Campground.find(JSON.parse(queryStr)).populate('bookings');
 
   // Select fields
   if (req.query.select) {
@@ -47,10 +48,10 @@ exports.getHospitals = async (req, res, next) => {
   const endIndex = page * limit;
 
   try {
-    const total = await Hospital.countDocuments();
+    const total = await Campground.countDocuments();
     query = query.skip(startIndex).limit(limit);
 
-    const hospitals = await query;
+    const campgrounds = await query;
 
     // Pagination result
     const pagination = {};
@@ -71,9 +72,9 @@ exports.getHospitals = async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      count: hospitals.length,
+      count: campgrounds.length,
       pagination,
-      data: hospitals
+      data: campgrounds
     });
   } catch (err) {
     res.status(400).json({
@@ -82,14 +83,14 @@ exports.getHospitals = async (req, res, next) => {
   }
 };
 
-// @desc    Get single hospitals      
-// @route   GET /api/v1/hospitals/:id
+// @desc    Get single campground      
+// @route   GET /api/v1/campgrounds/:id
 // @access  Public
-exports.getHospital = async (req, res, next) => {
+exports.getCampground = async (req, res, next) => {
   try {
-    const hospital = await Hospital.findById(req.params.id);
+    const campground = await Campground.findById(req.params.id);
 
-    if (!hospital) {
+    if (!campground) {
       return res.status(400).json({
         success: false
      }); 
@@ -97,7 +98,7 @@ exports.getHospital = async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      data: hospital
+      data: campground
     });
   } catch (err) {
     res.status(404).json({
@@ -106,32 +107,32 @@ exports.getHospital = async (req, res, next) => {
   }
 };
 
-// @desc    Create new hospital      
-// @route   PUSH /api/v1/hospitals
+// @desc    Create new campground      
+// @route   PUSH /api/v1/campgrounds
 // @access  Private
-exports.createHospital = async (req, res, next) => {
-  // create new Hospital and add to database 
-  const hospital = await Hospital.create(req.body);
+exports.createCampground = async (req, res, next) => {
+  // create new Campground and add to database 
+  const campground = await Campground.create(req.body);
   
   res.status(201).json({
     success: true, 
-    data: hospital
+    data: campground
   });
 };
 
-// @desc    Update hospital      
-// @route   PUT /api/v1/hospitals/:id
+// @desc    Update camground      
+// @route   PUT /api/v1/campgrounds/:id
 // @access  Private
-exports.updateHospital = async (req, res, next) => {
+exports.updateCampground = async (req, res, next) => {
   try {
-    const hospital = await Hospital.findByIdAndUpdate(req.params.id, req.body,
+    const campground = await Campground.findByIdAndUpdate(req.params.id, req.body,
       {
         new: true,
         runValidators: true
       }
     );
 
-    if (!hospital) {
+    if (!campground) {
       return res.status(400).json({
         success: false
       });
@@ -139,7 +140,7 @@ exports.updateHospital = async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      data: hospital
+      data: campground
     });
   } catch (err) {
     res.status(400).json({
@@ -148,29 +149,28 @@ exports.updateHospital = async (req, res, next) => {
   }
 };
 
-// @desc    Delete hospital      
-// @route   DELETE /api/v1/hospitals/:id
+// @desc    Delete campground      
+// @route   DELETE /api/v1/campgrounds/:id
 // @access  Private
-exports.deleteHospital = async (req, res, next) => {
+exports.deleteCampground = async (req, res, next) => {
   try {
-    const hospital = await Hospital.findById(req.params.id);
+    const campground = await Campground.findById(req.params.id);
 
-    if (!hospital) {
+    if (!campground) {
       return res.status(404).json({
         success: false,
-        msg: `Hospital not found with id of ${req.params.id}`
+        msg: `Campground not found with id of ${req.params.id}`
       });
     }
 
-    await Appointment.deleteMany({hospital: req.params.id});
-    await Hospital.deleteOne({_id: req.params.id});
+    await Booking.deleteMany({campground: req.params.id});
+    await Campground.deleteOne({_id: req.params.id});
 
     res.status(200).json({
       success: true, 
-      data: hospital
+      data: campground
     });
   } catch (err) {
-    // console.log(err);
 
     res.status(400).json({
       success:false,

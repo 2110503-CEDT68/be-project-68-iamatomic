@@ -20,9 +20,9 @@ const swaggerUI = require('swagger-ui-express');
 dotenv.config({path:'./config/config.env'});
 
 // Routes files 
-const campgrounds = require('./routes/campgrounds.js');
+const campgrounds = require('./routes/campgrounds');
 const auth = require('./routes/auth');
-const bookings = require('./routes/bookings.js');
+const bookings = require('./routes/bookings');
 
 const app = express();
 
