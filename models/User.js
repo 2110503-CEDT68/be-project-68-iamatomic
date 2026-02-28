@@ -7,6 +7,10 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Please add a name']
   },
+  tel: {
+    type: String,
+    required: [true, 'Please add a telephone number']
+  },
   email: {
     type: String,
     required: [true, 'Please add an email'],
@@ -24,7 +28,6 @@ const UserSchema = new mongoose.Schema({
   password: {
     type: String,
     required: [true, 'Please add a password'],
-
     minlength: 6,
     select: false
   },
@@ -39,7 +42,9 @@ const UserSchema = new mongoose.Schema({
 
 // Encrypt password using bcrypt
 UserSchema.pre('save', async function(next) {
-  // salt is random string next to password -> hash 
+  if (!this.isModified('password')) {
+    next();
+  }
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
 });
