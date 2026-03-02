@@ -94,7 +94,7 @@ exports.login = async (req, res, next) => {
 };
 
 // @desc    Get current login user
-// @route   POST /api/v1/auth/me
+// @route   GET /api/v1/auth/me
 // @access  Private
 exports.getMe = async (req, res, next) => {
   const user = await User.findById(req.user.id);
